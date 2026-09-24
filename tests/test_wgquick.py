@@ -88,6 +88,13 @@ def test_classify_reports_last_stderr_line():
     )
 
 
+def test_classify_skips_wg_quick_command_echo_lines():
+    # A failed `up` cleans up after itself, so the last stderr line is `[#] ip link
+    # delete dev wg0` — the real error is the last non-echo line.
+    stderr = "[#] ip link add wg0 type wireguard\nwg-quick: resolvconf: command not found\n[#] ip link delete dev wg0\n"
+    assert classify("up", "wg0", 1, stderr) == Result(False, "wg-quick: resolvconf: command not found")
+
+
 def test_classify_empty_stderr_reports_exit_code():
     assert classify("up", "wg0", 3, "") == Result(False, "wg-quick exited with code 3")
 

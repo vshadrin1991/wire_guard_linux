@@ -94,6 +94,7 @@ def notify(interface: str, message: str) -> None:
                 "notify-send",
                 "--app-name=WireGuard Indicator",
                 f"--icon={ICON_DIR / (ICON_APP + '.svg')}",
+                "--",  # wg-quick's stderr goes in `message`; a leading '-' must not become an option
                 f"WireGuard {interface}",
                 message,
             ],

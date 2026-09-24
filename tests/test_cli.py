@@ -37,6 +37,23 @@ def test_lock_path_prefers_xdg_runtime_dir(tmp_path, monkeypatch):
     assert path.name.endswith("-wg0.lock")
 
 
+def test_lock_path_falls_back_to_private_cache_dir(tmp_path, monkeypatch):
+    monkeypatch.delenv("XDG_RUNTIME_DIR", raising=False)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    path = lock_path("wg0")
+    assert path.parent == tmp_path / ".cache" / "wireguard-indicator"
+    assert path.parent.stat().st_mode & 0o777 == 0o700
+
+
+def test_acquire_lock_does_not_follow_symlinks_or_truncate(tmp_path):
+    target = tmp_path / "victim.txt"
+    target.write_text("keep me")
+    link = tmp_path / "indicator.lock"
+    link.symlink_to(target)
+    assert acquire_lock(link) is None
+    assert target.read_text() == "keep me"
+
+
 def test_main_refuses_second_instance(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv("XDG_RUNTIME_DIR", str(tmp_path))
     held = acquire_lock(lock_path("wg0"))  # pretend the autostarted copy is running

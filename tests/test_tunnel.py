@@ -40,14 +40,14 @@ def test_second_toggle_while_busy_is_ignored(tmp_path):
     assert tunnel.begin_toggle() == "up"
 
 
-@pytest.mark.parametrize("name", ["wg0", "wg-office", "vpn_1", "wg.home", "x" * 15])
+@pytest.mark.parametrize("name", ["wg0", "wg-office", "vpn_1", "wg.home", "_vpn", "x" * 15])
 def test_validate_interface_accepts_real_names(name):
     assert validate_interface(name) == name
 
 
 @pytest.mark.parametrize(
     "name",
-    ["", ".", "..", "x" * 16, "wg0; reboot", "wg 0", "../etc", "wg=0", "wg0\n"],
+    ["", ".", "..", "-h", "-wg0", ".hidden", "x" * 16, "wg0; reboot", "wg 0", "../etc", "wg=0", "wg0\n"],
 )
 def test_validate_interface_rejects_unsafe_names(name):
     with pytest.raises(ValueError):

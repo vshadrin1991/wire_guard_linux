@@ -7,6 +7,7 @@ A top-bar icon for Ubuntu that turns a WireGuard tunnel on and off.
 - Icon: green shield = connected, grey = disconnected, amber = working.
 - Middle-click the icon to toggle without opening the menu.
 - Changes made elsewhere (terminal, systemd) show up within 2 seconds.
+- "Connected" means the `wg0` interface exists (`/sys/class/net/wg0`), not that a peer handshake succeeded — checking handshakes needs root.
 
 ## Requirements
 
@@ -30,6 +31,13 @@ wireguard-indicator &                # or log out and back in; it autostarts
 ```
 
 The installer creates `/etc/sudoers.d/wireguard-indicator`. That rule lets **only your user** run **only** `wg-quick up wg0` and `wg-quick down wg0` without a password. Nothing else becomes passwordless.
+
+Two things to know about that rule:
+
+- **It is only as safe as `/etc/wireguard/wg0.conf`.** wg-quick runs the config's `PreUp`/`PostUp`/`PreDown`/`PostDown` hooks as root, so the installer refuses to install unless the config file and its folders are owned by root and not writable by group or others.
+- **Anything running as your user** — not just this app — can toggle the tunnel without a password. That is the accepted trade-off for a one-click switch; if the tunnel goes down unexpectedly, the icon shows it within 2 seconds.
+
+One install controls one interface. Re-running `install.sh` with a different interface replaces the launcher and the sudo rule for the previous one.
 
 ## Uninstall
 

@@ -41,7 +41,9 @@ def classify(action: Action, interface: str, returncode: int, stderr: str) -> Re
         return Result(True, f"{interface} was already up")
     if action == "down" and "is not a WireGuard interface" in stderr:
         return Result(True, f"{interface} was already down")
-    lines = [line for line in stderr.splitlines() if line.strip()]
+    # Skip "[#] ..." command-echo lines: on a failed `up` the last one is wg-quick's own
+    # cleanup (`ip link delete dev wg0`), which would hide the real error.
+    lines = [line for line in stderr.splitlines() if line.strip() and not line.startswith("[#]")]
     return Result(False, lines[-1] if lines else f"wg-quick exited with code {returncode}")
 
 

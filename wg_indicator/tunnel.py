@@ -10,7 +10,9 @@ Action = Literal["up", "down"]
 
 SYS_NET_DIR = Path("/sys/class/net")
 # Stricter than wg-quick's own rule: '=' and '+' would need escaping in sudoers.
-_INTERFACE_RE = re.compile(r"[A-Za-z0-9_.-]{1,15}")
+# The first character can't be '-' (argparse would read it as a flag) or '.'
+# (which also rules out "." and "..").
+_INTERFACE_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.-]{0,14}")
 
 
 class TunnelState(enum.Enum):
@@ -20,7 +22,7 @@ class TunnelState(enum.Enum):
 
 
 def validate_interface(name: str) -> str:
-    if name in (".", "..") or not _INTERFACE_RE.fullmatch(name):
+    if not _INTERFACE_RE.fullmatch(name):
         raise ValueError(f"invalid WireGuard interface name: {name!r}")
     return name
 
