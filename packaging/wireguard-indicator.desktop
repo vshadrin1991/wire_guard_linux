@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=WireGuard Indicator
+Comment=Turn the WireGuard tunnel on and off from the top bar
+Exec=wireguard-indicator
+Icon=/opt/wireguard-indicator/wg_indicator/icons/wireguard-indicator.svg
+Terminal=false
+Categories=Network;
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

@@ -1,0 +1,4 @@
+# Runtime needs no pip packages (PyGObject comes from apt); this file only configures pytest.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
